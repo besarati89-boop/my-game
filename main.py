@@ -38,7 +38,7 @@ def Show_students():
                     f"{student['name']} - {student['grade']}",
                     style="yellow"
                 )
-
+print("Amir")
 def add_student():
     name = input("Student name: ")
     grade = float(input("Student grade: "))
@@ -75,3 +75,4 @@ while True:
 
     else:
         console.print("Invalid option!", style="bold red")
+print(899381313661)
