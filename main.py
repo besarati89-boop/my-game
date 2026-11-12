@@ -1,8 +1,21 @@
 from rich.console import Console
-from engine import Question
+from engine import Question, Match
+import time
 
 console = Console()
 
+def get_players():
+    player1 = input("نام بازیکن اول: ")
+    player2 = input("نام بازیکن دوم: ")
+
+    return player1, player2
+
+def create_match():
+    player1, player2 = get_players()
+
+    match = Match(player1, player2, questions)
+
+    return match
 
 
 questions = [
@@ -12,6 +25,54 @@ questions = [
     Question("نماد شیمیایی طلا چیست؟", ["Ag", "Au", "Fe", "Gd"], "B"),
     Question("شاهنامه اثر کیست؟", ["حافظ", "سعدی", "فردوسی", "مولوی"], "C"),
 ]
+
+
+def start_game():
+    match = create_match()
+
+    console.print("مسابقه شروع شد!", style="bold green")
+    for i in range(5):
+        question = match.start_round()
+
+        console.print(f"\nراند {match.round}", style="bold yellow")
+
+        for player in match.players:
+            ask_player(match, player, question)
+
+        results = match.resolve_round()
+        for player, result in results.items():
+            console.print(
+        f"{player}: {result.status} | امتیاز این راند: {result.points}"
+    )
+            console.print("\n[bold cyan]نتیجه نهایی مسابقه[/bold cyan]")
+
+    for player in match.players:
+        console.print(f"{player}: {match.score_of(player)} امتیاز")
+
+    winner = match.winner()
+
+    if winner is None:
+        console.print("بازی مساوی شد!", style="bold yellow")
+    else:
+        console.print(f"برنده مسابقه: {winner} 🏆", style="bold green")
+    return match
+
+def ask_player(match, player, question):
+    console.print(f"\nنوبت {player} است!")
+
+    console.print(question.text)
+
+    for letter, option in zip("ABCD", question.options):
+        console.print(f"{letter}) {option}")
+
+    start_time = time.perf_counter()
+
+    answer = input("جواب شما (A-D): ")
+
+    elapsed = time.perf_counter() - start_time
+
+    match.submit(player, answer, elapsed)
+    
 def show_menu():
     console.print("\n[bold cyan]Quiz Battle[/bold cyan]")
     console.print("[bold green]۱)[/bold green] بازی جدید")
@@ -48,13 +109,12 @@ def show_results(score, correct_count, total):
 while True:
     show_menu()
     choice = input("انتخاب تو (۱ یا ۲): ").strip()
-    if choice == '2':
+    if choice in ("2", "۲"):
         console.print("خداحافظ!", style="bold cyan")
         break
-    if choice != "1":
+    if choice not in ("1", "۱"):
         continue
     
-    score, correct_count, total = play()
-    show_results(score, correct_count, total)
+start_game()
 
     
