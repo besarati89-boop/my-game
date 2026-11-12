@@ -1,78 +1,60 @@
 from rich.console import Console
+from engine import Question
 
 console = Console()
-students = []
 
+
+
+questions = [
+    Question("پایتخت ژاپن کدام است؟", ["توکیو", "کیوتو", "اوساکا", "سئول"], "A"),
+    Question("خروجی len('سلام') چیست؟", ["3", "4", "5", "خطا"], "B"),
+    Question("بزرگ‌ترین سیاره‌ی منظومه‌ی شمسی؟", ["زمین", "زحل", "مشتری", "نپتون"], "C"),
+    Question("نماد شیمیایی طلا چیست؟", ["Ag", "Au", "Fe", "Gd"], "B"),
+    Question("شاهنامه اثر کیست؟", ["حافظ", "سعدی", "فردوسی", "مولوی"], "C"),
+]
 def show_menu():
-    console.print("\nStudent Management System", style="bold blue")
-    console.print("1. Add student")
-    console.print("2. Show students")
-    console.print("3. Calculate average")
-    console.print("4. Exit")
-
-def Calculate_average():
-    if len(students) == 0:
-        console.print("No grades available!", style="red")
-    else:
-        total = 0
-
-    for student in students:
-        total += student["grade"]
-
-    average = total / len(students)
-
-    console.print(
-                f"Average grade: {average:.2f}",
-                style="bold green"
-            )
+    console.print("\n[bold cyan]Quiz Battle[/bold cyan]")
+    console.print("[bold green]۱)[/bold green] بازی جدید")
+    console.print("[bold red]۲)[/bold red] خروج")
 
 
-def Show_students():
-    if len(students) == 0:
-        console.print("No students found!", style="red")
-    else:
-        console.print("\nStudents List:", style="bold cyan")
+def play():
+    total = len(questions)
+    score = 0
+    correct_count = 0
 
-    for student in students:
-                console.print(
-                    f"{student['name']} - {student['grade']}",
-                    style="yellow"
-                )
-print("Amir")
-def add_student():
-    name = input("Student name: ")
-    grade = float(input("Student grade: "))
+    for i, q in enumerate(questions, start=1):
+        console.print(f"\n[bold cyan]سؤال {i} از {total}:[/bold cyan] {q.text}")
+        for letter, opt in zip("ABCD", q.options):
+            console.print(f"  [bold]{letter})[/bold] {opt}")
 
-    students.append({
-    "name": name,
-    "grade": grade
-    })
+        answer = input("جواب تو (A-D): ")
 
-console.print(
-            "Student added successfully!",
-            style="bold green"
-        )
+        if q.is_correct(answer):
+            console.print(" درست!", style="bold green")
+            score += 10
+            correct_count += 1
+        else:
+            console.print(f" غلط! جواب درست: {q.correct}", style="bold red")
 
+    return score, correct_count, total
 
+def show_results(score, correct_count, total):
+    percent = correct_count / total * 100
+    console.print("\n بازی تمام شد!", style="bold yellow")
+    console.print(f"   امتیاز تو: [bold green]{score}[/bold green]")
+    console.print(f"   درست: {correct_count} از {total}  ([bold]{percent:.0f}٪[/bold])")
 
 while True:
     show_menu()
-
-    choice = input("\nChoose an option: ")
-
-    if choice == "1":
-        add_student()
-
-    elif choice == "2":
-        Show_students()
-
-    elif choice == "3":
-        Calculate_average()
-
-    elif choice == "4":
-        console.print("Goodbye!", style="bold blue")
+    choice = input("انتخاب تو (۱ یا ۲): ").strip()
+    if choice == '2':
+        console.print("خداحافظ!", style="bold cyan")
         break
+    if choice != "1":
+        continue
+    
+    score, correct_count, total = play()
+    show_results(score, correct_count, total)
 
-    else:
-        console.print("Invalid option!", style="bold red")
-print(899381313661)
+    
